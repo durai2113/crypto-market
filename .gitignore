@@ -8,3 +8,5 @@ backend/venv/
 venv/
 .env
 *.db
+frontend/public/
+public/
