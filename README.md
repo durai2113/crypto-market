@@ -1,5 +1,7 @@
 # Crypto Market Platform — Developer Setup & Creation Handbook
 
+**Live Site:** [https://crypto-markets-eosin.vercel.app/](https://crypto-markets-eosin.vercel.app/)
+
 An end-to-end, high-performance web platform for real-time cryptocurrency tracking, indicator analytics, virtual portfolio trading, and limit threshold alerts. Powered by **FastAPI (Python)**, **PostgreSQL**, and **React (Vite)**.
 
 ---
