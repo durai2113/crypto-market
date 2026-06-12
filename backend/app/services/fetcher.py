@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 
-load_dotenv("D:/crypto-market/backend/.env")
+load_dotenv()
 
 COINGECKO_URL = os.getenv("COINGECKO_URL")
 

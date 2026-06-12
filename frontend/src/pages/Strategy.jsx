@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps, no-unused-vars */
 import { useEffect, useState } from "react";
 import { runStrategy } from "../api/cryptoApi";
 

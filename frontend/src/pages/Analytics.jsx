@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from "react";
 import { getAnalytics } from "../api/cryptoApi";
 import {

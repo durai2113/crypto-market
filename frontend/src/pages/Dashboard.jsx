@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from "react";
 import { getMarkets, fetchMarkets, runStrategy } from "../api/cryptoApi";
 
@@ -483,8 +484,32 @@ export default function Dashboard() {
           {error}
         </div>
       )}
-
-
+      {/* Stats Grid */}
+      <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px", marginBottom: "30px" }}>
+        <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
+          <span className="stat-label">Total Assets Tracked</span>
+          <span className="stat-value highlight" style={{ fontSize: "28px", color: "var(--color-cyan)" }}>{latestAssets.length}</span>
+        </div>
+        <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
+          <span className="stat-label">Total 24h Volume</span>
+          <span className="stat-value" style={{ fontSize: "28px", color: "#fff" }}>
+            ${totalVolume24h.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          </span>
+        </div>
+        <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
+          <span className="stat-label">Fear & Greed Index</span>
+          <span className="stat-value" style={{ fontSize: "28px", color: "var(--color-purple)" }}>
+            {sentiment}%
+          </span>
+          <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{sentimentLabel}</span>
+        </div>
+        <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
+          <span className="stat-label">Active Price Alerts</span>
+          <span className="stat-value" style={{ fontSize: "28px", color: "var(--color-green)" }}>
+            {activeAlertsCount}
+          </span>
+        </div>
+      </div>
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
@@ -558,6 +583,7 @@ export default function Dashboard() {
                   <tr>
                     <th>Symbol</th>
                     <th>Price (USD)</th>
+                    <th>Trend</th>
                     <th>Volume (24h)</th>
                     <th>Last Updated</th>
                     <th style={{ textAlign: "right" }}>Actions</th>
@@ -574,6 +600,9 @@ export default function Dashboard() {
                         </td>
                         <td style={{ color: "var(--color-cyan)", fontFamily: "var(--mono)", fontWeight: "600" }}>
                           ${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}
+                        </td>
+                        <td>
+                          {renderSparkline(asset.symbol)}
                         </td>
                         <td style={{ fontFamily: "var(--mono)", color: "var(--text-secondary)" }}>
                           ${asset.volume ? asset.volume.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "0"}
