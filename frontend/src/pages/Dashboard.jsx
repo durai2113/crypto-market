@@ -496,13 +496,7 @@ export default function Dashboard() {
             ${totalVolume24h.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </span>
         </div>
-        <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
-          <span className="stat-label">Fear & Greed Index</span>
-          <span className="stat-value" style={{ fontSize: "28px", color: "var(--color-purple)" }}>
-            {sentiment}%
-          </span>
-          <span style={{ fontSize: "12px", color: "var(--text-secondary)" }}>{sentimentLabel}</span>
-        </div>
+
         <div className="stat-card" style={{ background: "rgba(255, 255, 255, 0.02)" }}>
           <span className="stat-label">Active Price Alerts</span>
           <span className="stat-value" style={{ fontSize: "28px", color: "var(--color-green)" }}>
