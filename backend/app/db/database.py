@@ -11,7 +11,7 @@ if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in .env")
 
 # Programmatically rewrite direct Supabase URL to IPv4 pooler URL on Render
-if "db.mgwnhqkjbfcwljhmpobg.supabase.co" in DATABASE_URL:
+if os.getenv("RENDER") and "db.mgwnhqkjbfcwljhmpobg.supabase.co" in DATABASE_URL:
     import re
     match = re.search(r"postgres(?:ql)?://postgres:(.*?)@db\.mgwnhqkjbfcwljhmpobg\.supabase\.co(?::5432)?/(.*)", DATABASE_URL)
     if match:
