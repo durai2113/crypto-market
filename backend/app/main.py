@@ -16,7 +16,7 @@ from app.db.models import Base
 
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 
 @asynccontextmanager
