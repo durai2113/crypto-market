@@ -111,3 +111,19 @@ npm run dev
 - **APIs**: The backend handles queries via FastAPI routes and persists entries using SQLAlchemy ORM.
 - **Worker**: An active context scheduler runs in the background to automatically ingest cryptocurrency prices.
 - **Frontend State**: The React client uses native local storage persistence (`localStorage`) to save mock portfolio cash, current token shares, and custom alarm triggers, connecting to the API via `src/api/cryptoApi.js`.
+
+---
+
+## ☁️ Production Hosting (Render & Vercel)
+
+### 1. Backend Deployment (Render)
+When deploying the FastAPI backend to **Render**, the build command must target the subfolder requirements path:
+- **Build Command**: `pip install -r backend/requirements.txt`
+- **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- **Root Directory**: `backend` (or leave empty if referencing subfolder path prefix)
+
+### 2. Frontend Deployment (Vercel)
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Environment Variables**: `VITE_API_URL` pointing to your Render backend URL (e.g. `https://crypto-market-backend.onrender.com`).
