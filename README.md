@@ -117,10 +117,18 @@ npm run dev
 ## ☁️ Production Hosting (Render & Vercel)
 
 ### 1. Backend Deployment (Render)
-When deploying the FastAPI backend to **Render**, the build command must target the subfolder requirements path:
+When deploying the FastAPI backend to **Render**, you can choose one of the following configurations to prevent path resolution errors:
+
+#### Option A: Leave "Root Directory" empty on Render (Recommended & Bulletproof)
+- **Root Directory**: *(Leave blank)*
 - **Build Command**: `pip install -r backend/requirements.txt`
+- **Start Command**: `uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT`
+
+#### Option B: Set "Root Directory" to `backend`
+- **Root Directory**: `backend`
+- **Build Command**: `pip install -r requirements.txt`
 - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- **Root Directory**: `backend` (or leave empty if referencing subfolder path prefix)
+- *If you get an import error with this option, add an environment variable on Render:* `PYTHONPATH` = `.` (or `/opt/render/project/src/backend`)
 
 ### 2. Frontend Deployment (Vercel)
 - **Root Directory**: `frontend`
