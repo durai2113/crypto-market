@@ -11,6 +11,8 @@ if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in .env")
 
 # Using the exact connection string provided in .env
+if "sslmode" not in DATABASE_URL and "pooler.supabase" in DATABASE_URL:
+    DATABASE_URL += "?sslmode=require" if "?" not in DATABASE_URL else "&sslmode=require"
 
 engine = create_engine(DATABASE_URL)
 
