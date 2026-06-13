@@ -12,5 +12,9 @@ class Settings:
 
 settings = Settings()
 
-cors_origins_str = os.getenv("CORS_ORIGINS", "")
-CORS_ORIGINS = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+cors_origins_str = os.getenv("CORS_ORIGINS", "*")
+
+if cors_origins_str.strip() == "*":
+    CORS_ORIGINS = ["*"]
+else:
+    CORS_ORIGINS = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
