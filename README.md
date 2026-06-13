@@ -1,287 +1,135 @@
-# Crypto Market Platform
+# Crypto Market Platform — Developer Setup & Creation Handbook
 
-A full-stack web app that tracks cryptocurrency prices in real time, runs basic trading strategies, and lets you simulate trades with virtual money. Built with FastAPI on the backend, PostgreSQL for storage, and React on the frontend.
+**Live Site:** [https://crypto-markets-eosin.vercel.app/](https://crypto-markets-eosin.vercel.app/)
 
-I built this to learn how real-time data pipelines work — pulling live prices from CoinGecko, storing them in a database, running analysis on top, and displaying everything in a clean dashboard.
-
----
-
-## What it does
-
-**Dashboard** — Shows live prices for the top 50 cryptocurrencies. You can search by symbol, toggle auto-refresh every 10 seconds, or manually pull fresh data from CoinGecko. There's also a scrolling ticker tape at the top that shows prices updating in real time.
-
-**Portfolio Simulator** — You start with $10,000 in fake money and can buy/sell any tracked crypto at current market prices. It tracks your holdings, calculates profit/loss, and keeps a full transaction log. Everything persists in localStorage so you don't lose your portfolio on refresh.
-
-**Price Alerts** — Set custom alerts like "notify me when BTC goes above $65,000". When the condition is met, you get a toast notification in the corner of the screen. You can manage and delete alerts from the Alert Manager tab.
-
-**Analytics** — Visual charts built with Recharts. There's an area chart comparing prices of the top assets, a bar chart showing 24h trading volumes, and a ranked table of all tracked assets.
-
-**Strategy Signals** — A simple algorithm that compares the two most recent price records for each coin. If the price went up, it says BUY. If it went down, SELL. If unchanged, HOLD. It's basic, but it demonstrates how you'd wire up a strategy engine to a database.
-
-**Background Scheduler** — APScheduler runs in the background and fetches fresh data from CoinGecko every 5 minutes automatically. You don't have to manually click anything — the database keeps growing with historical price data.
+An end-to-end, high-performance web platform for real-time cryptocurrency tracking, indicator analytics, virtual portfolio trading, and limit threshold alerts. Powered by **FastAPI (Python)**, **PostgreSQL**, and **React (Vite)**.
 
 ---
 
-## Tech stack
+## 🛠️ Step-by-Step Project Creation Log
 
-- **Backend:** Python, FastAPI, Uvicorn, SQLAlchemy, APScheduler
-- **Database:** PostgreSQL (I used Supabase, but any Postgres instance works)
-- **Frontend:** React 19, Vite, React Router, Axios, Recharts
-- **Data source:** CoinGecko free API
-- **Styling:** Custom CSS with a dark theme, Outfit font from Google Fonts
+This section details how the project was initialized and structured from scratch.
 
----
-
-## Project structure
-
-```
-crypto-market/
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI app, CORS setup, route registration
-│   │   ├── api/routes/
-│   │   │   ├── market.py        # /markets/ endpoints
-│   │   │   ├── analytics.py     # /analytics/ endpoint
-│   │   │   └── strategy.py      # /strategy/ endpoints
-│   │   ├── core/
-│   │   │   └── config.py        # Loads env variables
-│   │   ├── db/
-│   │   │   ├── database.py      # SQLAlchemy engine and session
-│   │   │   └── models.py        # MarketData table definition
-│   │   └── services/
-│   │       ├── fetcher.py       # Pulls data from CoinGecko, saves to DB
-│   │       ├── scheduler.py     # Background job that runs every 5 min
-│   │       ├── analytics.py     # Computes rankings using pandas
-│   │       └── strategy.py      # BUY/SELL/HOLD logic using SQL window functions
-│   ├── .env
-│   ├── requirements.txt
-│   └── venv/
-│
-├── frontend/
-│   ├── src/
-│   │   ├── main.jsx             # React entry point
-│   │   ├── App.jsx              # Layout, sidebar, routing, ticker tape
-│   │   ├── index.css            # Global styles and design tokens
-│   │   ├── api/
-│   │   │   └── cryptoApi.js     # Axios client for all API calls
-│   │   └── pages/
-│   │       ├── Dashboard.jsx    # Main page — prices, portfolio, alerts
-│   │       ├── Analytics.jsx    # Charts and rankings
-│   │       └── Strategy.jsx     # Trading signal output
-│   ├── .env
-│   ├── package.json
-│   └── vite.config.js
-│
-├── package.json
-├── .gitignore
-└── README.md
-```
+### Part 1: Backend Setup (FastAPI & SQLAlchemy)
+1. **Initialize Project Directory**:
+   ```bash
+   mkdir crypto-market
+   cd crypto-market
+   mkdir backend
+   cd backend
+   ```
+2. **Create Python Virtual Environment**:
+   ```bash
+   python -m venv venv
+   # Activate on Windows:
+   venv\Scripts\activate
+   # Activate on Unix/macOS:
+   source venv/bin/activate
+   ```
+3. **Install Core Backend Dependencies**:
+   ```bash
+   pip install fastapi uvicorn sqlalchemy psycopg2-binary requests apscheduler python-dotenv
+   pip freeze > requirements.txt
+   ```
+4. **Define Database Connection & Models**:
+   - Set up `app/db/database.py` with SQLAlchemy engines.
+   - Set up `app/db/models.py` to declare the SQL Schema mapping:
+     - `market_data` table tracking: `id` (PK), `symbol` (Indexed String), `price` (Float), `volume` (Float), and `timestamp` (DateTime).
+5. **Implement Background Ingestion Worker**:
+   - Coded `app/services/fetcher.py` to pull top 50 assets from CoinGecko API and save prices/volumes to Postgres.
+   - Coded `app/services/scheduler.py` using `APScheduler` to run data refreshes every 60 seconds automatically.
+6. **Expose REST API Endpoints**:
+   - `/markets/` (GET): Pulls historical asset logs.
+   - `/markets/fetch` (POST): Explicitly trigger CoinGecko sync.
+   - `/analytics/` (GET): Resolves price average and top assets.
+   - `/strategy/run` (POST): Compares the two most recent price logs of each asset to generate volatility indicators (BUY, SELL, HOLD).
 
 ---
 
-## How the pieces connect
-
-```
-CoinGecko API
-     │
-     │  (fetcher.py pulls top 50 coins every 5 min)
-     ▼
-PostgreSQL Database
-     │
-     │  (SQLAlchemy ORM)
-     ▼
-FastAPI Backend  ──────►  REST API (JSON)
-     │
-     │  (Axios HTTP calls)
-     ▼
-React Frontend  ──────►  Dashboard / Charts / Strategy
-```
-
-The scheduler kicks in when the backend starts. It fetches prices from CoinGecko and writes them to a `market_data` table in Postgres. The frontend calls the FastAPI endpoints to read that data and render it. The portfolio simulator and alerts run entirely on the client side using localStorage.
+### Part 2: Frontend Setup (React & Vite)
+1. **Initialize React App**:
+   ```bash
+   # From root 'crypto-market/'
+   npx -y create-vite@latest frontend --template react
+   cd frontend
+   npm install
+   ```
+2. **Install Core UI Dependencies**:
+   ```bash
+   npm install react-router-dom axios recharts
+   ```
+3. **Configure Custom Stylings**:
+   - Custom-themed `src/index.css` with dark mode variables, Outfit fonts, CSS tables, hover scales, and clean alert toast transitions.
+4. **Program Page Components**:
+   - `Dashboard.jsx`: Features search bar, transaction list logs, threshold alerts settings with floating notification triggers, and mock trading simulator.
+   - `Analytics.jsx`: Houses price Area charts and volume Bar charts styled with custom gradients.
+   - `Strategy.jsx`: Displays the top 15 indicator output log signals.
 
 ---
 
-## Getting started
+## 🚀 Setup & Launch Instructions
 
-### What you need installed
+Follow these instructions to run the project locally.
 
-- Python 3.10 or higher
-- Node.js 18 or higher
-- PostgreSQL (local install, or a cloud one like Supabase/Neon/Railway)
-- Git
+### 1. Database Configuration
+The platform is built on PostgreSQL. Set up a local or cloud-hosted PostgreSQL instance:
 
-### Clone and set up
+#### Setup:
+1. Install PostgreSQL locally or use a cloud provider (e.g., Railway, Neon, Render Postgres).
+2. Create a database for the project.
+3. Get your connection URI and update your `backend/.env` file:
+   ```env
+   DATABASE_URL=postgresql://username:password@host:5432/database_name
+   COINGECKO_URL=https://api.coingecko.com/api/v3/coins/markets
+   CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+   ```
+4. When the backend starts, SQLAlchemy will automatically create the `market_data` table.
 
-```bash
-git clone https://github.com/durai2113/crypto-market.git
-cd crypto-market
-```
+### 2. Startup Commands
 
-### Backend
-
+#### A. Backend API Server
 ```bash
 cd backend
-python -m venv venv
-
-# activate the virtual environment
-venv\Scripts\activate        # Windows
-source venv/bin/activate     # Mac/Linux
-
+venv\Scripts\activate  # Windows
 pip install -r requirements.txt
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
+- API will start at: `http://127.0.0.1:8000`
+- Interactive Swagger documentation: `http://127.0.0.1:8000/docs`
 
-Create a `.env` file inside `backend/`:
-
-```env
-DATABASE_URL=postgresql://username:password@host:5432/database_name
-COINGECKO_URL=https://api.coingecko.com/api/v3/coins/markets
-CORS_ORIGINS=*
-```
-
-Replace the `DATABASE_URL` with your actual Postgres connection string. The `COINGECKO_URL` stays as is. Set `CORS_ORIGINS=*` for local development — in production you'd restrict it to your frontend domain.
-
-The database table gets created automatically on first startup, so you don't need to run any migrations.
-
-### Frontend
-
+#### B. Frontend Client
 ```bash
 cd frontend
 npm install
-```
-
-Create a `.env` file inside `frontend/`:
-
-```env
-VITE_API_URL=http://127.0.0.1:8000
-```
-
-This tells the frontend where the backend is running.
-
----
-
-## Running it
-
-Open two terminals:
-
-**Terminal 1 — Backend**
-
-```bash
-cd backend
-venv\Scripts\activate
-uvicorn app.main:app --host 127.0.0.1 --port 8000
-```
-
-You should see `Uvicorn running on http://127.0.0.1:8000` and `Starting scheduler...` in the output. That means the API is live and the background data fetcher is running.
-
-You can also check the auto-generated API docs at http://127.0.0.1:8000/docs — FastAPI gives you a nice Swagger UI for free.
-
-**Terminal 2 — Frontend**
-
-```bash
-cd frontend
 npm run dev
 ```
-
-Open http://localhost:5173 in your browser. That's it — you should see the dashboard.
-
-If there's no data yet, click "Fetch Latest Market Data" on the dashboard. Wait a few seconds, then click it again. After two fetches you'll have enough data for the strategy signals to work too.
+- Frontend will start at: `http://localhost:5173`
 
 ---
 
-## API reference
+## 📈 System Flow & Architecture
 
-### General
-
-| Method | Path | What it does |
-|--------|------|-------------|
-| GET | `/` | Health check. Returns `{"message": "Crypto Market API Running"}` |
-
-### Markets
-
-| Method | Path | What it does |
-|--------|------|-------------|
-| GET | `/markets/` | Returns the latest 10 market records from the database |
-| GET | `/markets/prices?symbol=BTC` | Returns the most recent price for a specific coin |
-| POST | `/markets/fetch` | Triggers a fresh pull from CoinGecko and saves to DB |
-
-### Analytics
-
-| Method | Path | What it does |
-|--------|------|-------------|
-| GET | `/analytics/` | Returns all assets ranked by price, with total count and volumes |
-
-### Strategy
-
-| Method | Path | What it does |
-|--------|------|-------------|
-| GET | `/strategy/` | Simple health check |
-| POST | `/strategy/run` | Runs the strategy and returns BUY/SELL/HOLD signals |
-| GET | `/strategy/results` | Same as above, but as a GET request |
-
-### Sample response — `/markets/`
-
-```json
-[
-  {
-    "id": 1,
-    "symbol": "BTC",
-    "price": 63943.0,
-    "volume": 31032110360.0,
-    "timestamp": "2026-06-12T17:13:07.853911"
-  }
-]
-```
-
-### Sample response — `/strategy/results`
-
-```json
-[
-  {
-    "symbol": "BTC",
-    "latest_price": 63943.0,
-    "previous_price": 63800.0,
-    "signal": "BUY"
-  }
-]
-```
+- **APIs**: The backend handles queries via FastAPI routes and persists entries using SQLAlchemy ORM.
+- **Worker**: An active context scheduler runs in the background to automatically ingest cryptocurrency prices.
+- **Frontend State**: The React client uses native local storage persistence (`localStorage`) to save mock portfolio cash, current token shares, and custom alarm triggers, connecting to the API via `src/api/cryptoApi.js`.
 
 ---
 
-## Database
+## ☁️ Production Hosting (Render & Vercel)
 
-There's just one table:
+### 1. Backend Deployment (Render)
+To deploy the FastAPI backend successfully, configure the Render Web Service with the following settings:
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | Integer | Auto-increment primary key |
-| symbol | String | Indexed. Crypto ticker like BTC, ETH, SOL |
-| price | Float | Price in USD at time of fetch |
-| volume | Float | 24h trading volume |
-| timestamp | DateTime | When the record was created |
+- **Root Directory**: `backend` (This navigates Render inside the `backend/` folder at launch)
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
----
+*Note: Since the code imports packages starting with `app.` (e.g., `from app.api...`), Python expects the server to run inside the `backend/` folder. If you encounter any module resolution issues, add this environment variable on Render:*
+- **Key**: `PYTHONPATH`
+- **Value**: `.` (or `/opt/render/project/src/backend`)
 
-## How the strategy works
-
-It's intentionally simple. The backend runs a SQL query that grabs the two most recent price records for each coin (using a window function with `ROW_NUMBER()`). Then it compares them:
-
-- Latest price **higher** than previous → **BUY**
-- Latest price **lower** than previous → **SELL**
-- Same price → **HOLD**
-
-This needs at least two rounds of data ingestion to work. If you just set up the project, fetch data twice from the dashboard and then check the Strategy page.
-
----
-
-## Things to know
-
-- The portfolio simulator is entirely client-side. It uses `localStorage` to save your balance, holdings, and trade history. Clearing your browser data will reset it.
-- The scheduler runs every 5 minutes. You'll see `Market data updated successfully` in the backend terminal each time it runs.
-- CoinGecko's free API has rate limits. If you hit them, the fetcher will log an error but the app won't crash.
-- The frontend auto-refreshes every 10 seconds when the toggle is on. This only reads from your database — it doesn't hit the CoinGecko API.
-
----
-
-## License
-
-Built for learning and demonstration purposes.
+### 2. Frontend Deployment (Vercel)
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `dist`
+- **Environment Variables**: `VITE_API_URL` pointing to your Render backend URL (e.g. `https://crypto-market-backend.onrender.com`).
