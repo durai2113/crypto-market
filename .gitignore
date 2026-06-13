@@ -1,12 +1,30 @@
+# Environment files
 backend/.env
 frontend/.env
-node_modules/
+.env
+
+# Python
 __pycache__/
 *.pyc
-dist/
+*.pyo
 backend/venv/
 venv/
-.env
+
+# Node
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+frontend/dist/
+
+# Database
 *.db
-frontend/public/
-public/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
