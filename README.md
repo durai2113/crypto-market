@@ -72,19 +72,18 @@ This section details how the project was initialized and structured from scratch
 Follow these instructions to run the project locally.
 
 ### 1. Database Configuration
-The platform is built on PostgreSQL. You can use a local PostgreSQL instance or connect to a cloud provider like **Supabase**:
+The platform is built on PostgreSQL. Set up a local or cloud-hosted PostgreSQL instance:
 
-#### Using Supabase:
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Go to **Project Settings** -> **Database** -> **Connection string** (select **URI** mode).
-3. Copy the URI and replace the `[YOUR-PASSWORD]` placeholder with your database password.
-4. Update your `backend/.env` file:
+#### Setup:
+1. Install PostgreSQL locally or use a cloud provider (e.g., Railway, Neon, Render Postgres).
+2. Create a database for the project.
+3. Get your connection URI and update your `backend/.env` file:
    ```env
-   DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
+   DATABASE_URL=postgresql://username:password@host:5432/database_name
    COINGECKO_URL=https://api.coingecko.com/api/v3/coins/markets
    CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
    ```
-5. When the backend starts, SQLAlchemy will automatically initialize and construct the `market_data` schema on Supabase.
+4. When the backend starts, SQLAlchemy will automatically create the `market_data` table.
 
 ### 2. Startup Commands
 
